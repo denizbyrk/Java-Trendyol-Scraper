@@ -4,88 +4,154 @@ import java.io.IOException;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 public class WebScraper {
 
-	private String title;
-	private String price;
-	private String ranking;
-
+	private Product product;
+	private Document document;
+	
 	public void Read(String url) throws IOException {
-		
-		Document document = Jsoup.connect(url).get();
-		
-		this.title = this.processTitle(document);
-		
-		this.price = this.processPrice(document);
-		
-		this.ranking = this.processRanking(document);
-			
-		System.out.println("Title: " + this.title);
-		System.out.println("Price: " + this.price);
-		System.out.println("Ranking: " + this.ranking);
+
+		this.product = new Product();
+		this.document = Jsoup.connect(url).get();
+
+		this.product.setTitle(this.scrapeTitle());
+		this.product.setPrice(this.scrapePrice());
+		this.product.setRanking(this.scrapeRanking());
+		this.product.setRankingCount(this.scrapeRankingCount());
+		this.product.setCommentCount(this.scrapeCommentCount());
+		this.product.setBrand(this.scrapeBrand());
+		this.product.setSeller(this.scrapeSeller());
+
+		this.product.displayData();
 	}
-	
+
 	//scrape title
-	private String processTitle(Document document) {
-		
-		Elements product = document.select(".pr-in-cn");
-				
-		if (!product.isEmpty()) {
-			
-		    return product.select("h1 > span").text();
-		    
+	private String scrapeTitle() {
+
+		Elements title = this.document.select(".pr-in-cn");
+
+		if (!title.isEmpty()) {
+
+			return title.select("h1 > span").text();
+
 		} else {
-			
-		    return "Rating not found";
+
+			return "Title not found";
 		}
 	}
-	
+
 	//scrape price
-	private String processPrice(Document document) {
-		
-		Elements product = document.select(".product-price-container");
-		
-		if (!product.isEmpty()) {
-			
-		    return product.select("div > div > span").text();
-		    
+	private String scrapePrice() {
+
+		Elements price = this.document.select(".product-price-container");
+
+		if (!price.isEmpty()) {
+
+			return price.select("div > div > span").text();
+
 		} else {
-			
-		    return "Rating not found";
+
+			return "Price not found";
 		}
 	}
 	
+	//scrape comment count
+	private String scrapeSeller() {
+		
+		Element brand = this.document.select("span.product-description-market-place").first();
+
+		if (!brand.text().isEmpty()) {
+			
+			return brand.text();
+
+		} else {
+
+			return "Brand not found";
+		}
+	}
+
 	//scrape ranking
-	private String processRanking(Document document) {
+	private String scrapeRanking() {
+
+		return this.scrapeJSON("aggregateRating", "ratingValue");
+	}
+	
+	//scrape ranking count
+	private String scrapeRankingCount() {
 		
-		Elements product = document.select(".product-rating-score .value, .tooltip-wrapper .tooltip-average-content");
+		return this.scrapeJSON("aggregateRating", "ratingCount");
+	}
+	
+	//scrape brand
+	private String scrapeBrand() {
 		
-		System.out.println(document.html());
+		return this.scrapeJSON("manufacturer");
+	}
+	
+	//scrape comment count
+	private String scrapeCommentCount() {
 		
-		if (!product.isEmpty()) {
+		return this.scrapeJSON("aggregateRating", "reviewCount");
+	}
+	
+	//scrape JSON data
+	private String scrapeJSON(String objectTitle) {
+		
+		Element e = document.selectFirst("script[type=application/ld+json]");
+		
+		if (e != null) {
 			
-		    return product.text();
-		    
+			String jsonContent = e.html();
+
+			JsonObject jsonObject = JsonParser.parseString(jsonContent).getAsJsonObject();
+
+			if (jsonObject.has(objectTitle)) {
+				
+				return jsonObject.get(objectTitle).getAsString();
+			} else {
+				
+				return objectTitle + " not found.";
+			}
 		} else {
 			
-		    return "Rating not found";
+			return objectTitle + " not found.";
 		}
 	}
 	
-	public String getTitle() {
+	//scrape JSON data
+	private String scrapeJSON(String objectTitle, String data) {
 		
-		return this.title;
+		Element e = document.selectFirst("script[type=application/ld+json]");
+		
+		if (e != null) {
+			
+			String jsonContent = e.html();
+
+			JsonObject jsonObject = JsonParser.parseString(jsonContent).getAsJsonObject();
+			JsonObject result = jsonObject.getAsJsonObject(objectTitle);
+
+			if (result != null && result.has(data)) {
+				
+				return result.get(data).getAsString();
+			} else {
+				
+				return data + " not found.";
+			}
+		} else {
+			
+			return data + " not found.";
+		}
 	}
 
-	public String getRanking() {
+	//get product
+	public Product getProduct() {
 		
-		return this.ranking;
-	}
-
-	public String getPrice() {
-		
-		return this.price;
+		return this.product;
 	}
 }

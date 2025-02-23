@@ -140,7 +140,16 @@ public class Main extends JFrame {
     //process URL
     private void processURL(String url) throws IOException {
     	
+    	String lines = "";
+    	
+    	for (int i = 0; i < url.length() + 16; i++) {
+    		
+    		lines += "=";
+    	}
+    	
+    	System.out.println(lines);
         System.out.println("Processing URL: " + url);
+        System.out.println(lines + "\n");
         
         if (url.startsWith("https://www.trendyol.com/")) {
         	
@@ -159,26 +168,33 @@ public class Main extends JFrame {
     	
         this.infoPanel.removeAll(); 
         
-        String title = ws.getTitle();
-        String price = ws.getPrice();
-        String ranking = ws.getRanking();
+        Product p = ws.getProduct();
         
-        JLabel titleLabel = new JLabel("Title: " + title);
+        JLabel titleLabel = new JLabel("Title: " + p.getTitle());
         titleLabel.setBounds(20, 20, 400, 25);
-        infoPanel.add(titleLabel);
-
-        JLabel priceLabel = new JLabel("Price: " + price);
+        
+        JLabel priceLabel = new JLabel("Price: " + p.getPrice());
         priceLabel.setBounds(20, 50, 400, 25);
-        infoPanel.add(priceLabel);
 
-        JLabel rankingLabel = new JLabel("Ranking: " + ranking);
+        JLabel rankingLabel = new JLabel("Ranking: " + p.getRanking() + " / 5 --- " + p.getRankingCount() + " Votes");
         rankingLabel.setBounds(20, 80, 400, 25);
-        infoPanel.add(rankingLabel);
 
+        JLabel reviewCountLabel = new JLabel("Comment Count: " + p.getCommentCount());
+        reviewCountLabel.setBounds(20, 110, 400, 25);
+
+        JLabel sellerLabel = new JLabel("Seller: " + p.getSeller());
+        sellerLabel.setBounds(20, 140, 400, 25);
+        
+        JLabel brandLabel = new JLabel("Brand: " + p.getBrand());
+        brandLabel.setBounds(20, 170, 400, 25);
+        
         this.infoPanel.add(titleLabel);
         this.infoPanel.add(priceLabel);
         this.infoPanel.add(rankingLabel);
-
+        this.infoPanel.add(reviewCountLabel);
+        this.infoPanel.add(sellerLabel);
+        this.infoPanel.add(brandLabel);
+        
         this.infoPanel.setVisible(true);
         this.infoPanel.revalidate();
         this.infoPanel.repaint();
