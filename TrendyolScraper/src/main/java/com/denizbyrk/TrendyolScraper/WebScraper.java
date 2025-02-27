@@ -7,6 +7,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -20,6 +22,7 @@ public class WebScraper {
 		this.product = new Product();
 		this.document = Jsoup.connect(url).get();
 
+		this.product.setImageURL(this.scrapeImage());
 		this.product.setTitle(this.scrapeTitle());
 		this.product.setPrice(this.scrapePrice());
 		this.product.setRanking(this.scrapeRanking());
@@ -31,6 +34,12 @@ public class WebScraper {
 		this.product.displayData();
 	}
 
+	//scrape image 
+	private String scrapeImage() {
+		
+		return this.scrapeJSON("image", "contentUrl");
+	}
+	
 	//scrape title
 	private String scrapeTitle() {
 
@@ -137,8 +146,22 @@ public class WebScraper {
 			JsonObject result = jsonObject.getAsJsonObject(objectTitle);
 
 			if (result != null && result.has(data)) {
-				
-				return result.get(data).getAsString();
+			
+				JsonElement element = result.get(data);
+
+                if (element.isJsonArray()) {
+                	
+                    JsonArray contentArray = element.getAsJsonArray();
+                    
+                    if (!contentArray.isEmpty()) {
+                    
+                        return contentArray.get(0).getAsString();
+                    }
+                    
+                } else {
+                	
+                	return result.get(data).getAsString();
+                }
 			} else {
 				
 				return data + " not found.";
@@ -147,6 +170,8 @@ public class WebScraper {
 			
 			return data + " not found.";
 		}
+		
+		return data + " not found.";
 	}
 
 	//get product

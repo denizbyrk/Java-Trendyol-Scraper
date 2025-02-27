@@ -2,13 +2,16 @@ package com.denizbyrk.TrendyolScraper;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
+import java.net.URL;
 
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -16,6 +19,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
 import javax.swing.JTextField;
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
@@ -41,11 +45,11 @@ public class Main extends JFrame {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(Main.WIDTH, Main.HEIGHT);
         this.setLocationRelativeTo(null);
-        
+
         this.font = new Font("Arial", Font.BOLD, 18);
         this.dataFont = new Font("Arial", Font.BOLD, 12);
 
-        UIManager.put("Button.background", Color.LIGHT_GRAY);
+        UIManager.put("Button.background", Color.WHITE);
         UIManager.put("Button.foreground", Color.BLACK);
         UIManager.put("Button.focus", new Color(0, 0, 0, 0));
         UIManager.put("Label.font", this.dataFont);
@@ -54,7 +58,8 @@ public class Main extends JFrame {
         //create a panel with a null layout
         JPanel contentPane = new JPanel();
         contentPane.setLayout(null);
-        
+        contentPane.setBounds(0, 0, Main.WIDTH, 50);
+
         //title label (top)
         JLabel titleLabel = new JLabel("Trendyol Web Scraper");
         titleLabel.setFont(this.font);
@@ -72,18 +77,12 @@ public class Main extends JFrame {
         //fetch button (next to TextField)
         fetchButton = new JButton("Fetch");
         fetchButton.setFont(this.font);
-        fetchButton.setForeground(Color.BLACK);
-        fetchButton.setBackground(Color.WHITE);
         fetchButton.setFocusPainted(false);
         fetchButton.setBounds(Main.WIDTH - 140, titleLabel.getBounds().y + 30, 100, 25);
-        
-        fetchButton.setForeground(Color.BLACK);
-        fetchButton.setBackground(Color.WHITE);
         Border line = new LineBorder(Color.BLACK);
         Border margin = new EmptyBorder(5, 15, 5, 15);
         Border compound = new CompoundBorder(line, margin);
         fetchButton.setBorder(compound);
-        
         contentPane.add(fetchButton);
 
         //URL TextField (next to URL label)
@@ -170,34 +169,42 @@ public class Main extends JFrame {
         
         Product p = ws.getProduct();
         
-        JLabel titleLabel = new JLabel("Title: " + p.getTitle());
-        titleLabel.setBounds(20, 20, 400, 25);
+        ImageIcon imageIcon = new ImageIcon(new URL(p.getImageURL()));
+        Image image = imageIcon.getImage();
+        Image scaledImage = image.getScaledInstance(getWidth() / 3, getHeight() / 3, Image.SCALE_AREA_AVERAGING);
+
+        JLabel imageLabel = new JLabel(new ImageIcon(scaledImage));
+        imageLabel.setBounds(20, 20, scaledImage.getWidth(imageLabel), scaledImage.getHeight(imageLabel));
+        imageLabel.setBorder(new LineBorder(Color.BLACK, 2));
         
-        JLabel priceLabel = new JLabel("Price: " + p.getPrice());
-        priceLabel.setBounds(20, 50, 400, 25);
+        JLabel titleLabel = new JLabel("<html>Title: " + p.getTitle() + "</html>");
+        titleLabel.setBounds(imageLabel.getBounds().x + imageLabel.getBounds().width + 8, 20, 300, 50); 
+        titleLabel.setVerticalAlignment(SwingConstants.TOP);
+        
+        JLabel priceLabel = new JLabel("<html><b>Price:</b> " + p.getPrice() + "</html>");
+        priceLabel.setBounds(imageLabel.getBounds().x + imageLabel.getBounds().width + 8, titleLabel.getBounds().y + 40, 400, 25);
 
         JLabel rankingLabel = new JLabel("Ranking: " + p.getRanking() + " / 5 --- " + p.getRankingCount() + " Votes");
-        rankingLabel.setBounds(20, 80, 400, 25);
+        rankingLabel.setBounds(imageLabel.getBounds().x + imageLabel.getBounds().width + 8, priceLabel.getBounds().y + 30, 400, 25);
 
         JLabel reviewCountLabel = new JLabel("Comment Count: " + p.getCommentCount());
-        reviewCountLabel.setBounds(20, 110, 400, 25);
+        reviewCountLabel.setBounds(imageLabel.getBounds().x + imageLabel.getBounds().width + 8, rankingLabel.getBounds().y + 30, 400, 25);
 
         JLabel sellerLabel = new JLabel("Seller: " + p.getSeller());
-        sellerLabel.setBounds(20, 140, 400, 25);
+        sellerLabel.setBounds(imageLabel.getBounds().x + imageLabel.getBounds().width + 8, reviewCountLabel.getBounds().y + 30, 400, 25);
         
         JLabel brandLabel = new JLabel("Brand: " + p.getBrand());
-        brandLabel.setBounds(20, 170, 400, 25);
-        
+        brandLabel.setBounds(imageLabel.getBounds().x + imageLabel.getBounds().width + 8, sellerLabel.getBounds().y + 30, 400, 25);
+
+        this.infoPanel.add(imageLabel);
         this.infoPanel.add(titleLabel);
         this.infoPanel.add(priceLabel);
         this.infoPanel.add(rankingLabel);
         this.infoPanel.add(reviewCountLabel);
         this.infoPanel.add(sellerLabel);
         this.infoPanel.add(brandLabel);
-        
+
         this.infoPanel.setVisible(true);
-        this.infoPanel.revalidate();
-        this.infoPanel.repaint();
     }
 
     public static void main(String[] args) {
