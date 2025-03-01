@@ -7,6 +7,7 @@ public class Product {
 	private String imageURL;
 	private String title;
 	private String price;
+	private List<String> category;
 	private String ranking;
 	private String rankingCount;
 	private String description;
@@ -18,15 +19,17 @@ public class Product {
 		
 	public Product() { }
 	
-	public Product(String imageURL, String title, String price, String ranking, String rankingCount, String description, String commentCount, String brand, String seller, String favourites) {
+	public Product(String imageURL, String title, String price, List<String> category, String ranking, String rankingCount, String description, String commentCount, List<Comment> comments, String brand, String seller, String favourites) {
 
 		this.imageURL = imageURL;
 		this.title = title;
 		this.price = price;
+		this.category = category;
 		this.ranking = ranking;
 		this.rankingCount = rankingCount;
 		this.description = description;
 		this.commentCount = commentCount;
+		this.comments = comments;
 		this.brand = brand;
 		this.seller = seller;
 		this.favourites = favourites;
@@ -59,6 +62,16 @@ public class Product {
 	public void setPrice(String price) {
 		
 		this.price = price;
+	}
+	
+	public List<String> getCategory() {
+		
+		return this.category;
+	}
+	
+	public void setCategory(List<String> category) {
+		
+		this.category = category;
 	}
 	
 	public String getRanking() {
@@ -147,6 +160,7 @@ public class Product {
 	           "---------------\n" +
 	           "Image: " + this.getImageURL() + "\n" +
 	           "Title: " + this.getTitle() + "\n" +
+	           "Category: " + this.getCategory() + "\n" +
 	           "Price: " + this.getPrice() + "\n" +
 	           "Ranking: " + this.getRanking() + " / 5 --- " + this.getRankingCount() + " Votes\n" +
 	           "Review Count: " + this.getCommentCount() + "\n" +

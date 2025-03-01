@@ -27,6 +27,7 @@ public class WebScraper {
 		this.product.setImageURL(this.scrapeImage());
 		this.product.setTitle(this.scrapeTitle());
 		this.product.setPrice(this.scrapePrice());
+		this.product.setCategory(this.scrapeCategory());
 		this.product.setRanking(this.scrapeRanking());
 		this.product.setRankingCount(this.scrapeRankingCount());
 		this.product.setCommentCount(this.scrapeCommentCount());
@@ -73,6 +74,12 @@ public class WebScraper {
 		}
 	}
 	
+	//scrape category
+	private List<String> scrapeCategory() {
+		
+		return this.scrapeJSONcategory();
+	}
+	
 	//scrape comment count
 	private String scrapeSeller() {
 		
@@ -114,7 +121,7 @@ public class WebScraper {
 	
 	private List<Comment> scrapeComments() {
 		
-		return this.scrapeJSONcomments("", "");
+		return this.scrapeJSONcomments();
 	}
 	
 	//scrape JSON data
@@ -185,8 +192,39 @@ public class WebScraper {
 		return data + " not found.";
 	}
 	
+	//scrape category data
+	private List<String> scrapeJSONcategory() {
+		
+		Element e = document.select("script[type=application/ld+json]").get(1);
+		
+		List<String> categories = new ArrayList<String>();
+		
+		if (e != null) {
+			
+			String jsonContent = e.html();
+			
+            JsonObject jsonObject = JsonParser.parseString(jsonContent).getAsJsonObject();
+            JsonObject breadcrumb = jsonObject.getAsJsonObject("breadcrumb");
+            JsonArray itemList = breadcrumb.getAsJsonArray("itemListElement");
+            
+            for (JsonElement element : itemList) {
+                
+                JsonObject listItem = element.getAsJsonObject();
+                JsonObject item = listItem.getAsJsonObject("item");
+
+                String name = item.get("name").getAsString();
+                
+                categories.add(name);
+            }
+            
+            return categories;
+		}
+		
+		return categories;
+	}
+	
 	//scrape comment data
-	private List<Comment> scrapeJSONcomments(String objectTitle, String data) {
+	private List<Comment> scrapeJSONcomments() {
 		
 		Element e = document.selectFirst("script[type=application/ld+json]");
 		

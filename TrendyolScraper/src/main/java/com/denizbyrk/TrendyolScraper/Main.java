@@ -1,6 +1,7 @@
 package com.denizbyrk.TrendyolScraper;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
@@ -186,12 +187,32 @@ public class Main extends JFrame {
         imageLabel.setBounds(20, 20, scaledImage.getWidth(imageLabel), scaledImage.getHeight(imageLabel));
         imageLabel.setBorder(new LineBorder(Color.BLACK, 2));
         
-        JLabel titleLabel = new JLabel("<html>Title: " + p.getTitle() + "</html>");
+        JLabel titleLabel = new JLabel("<html><div style='width: 240px;'>Title: " + p.getTitle() + "</div></html>");
         titleLabel.setBounds(imageLabel.getBounds().x + imageLabel.getBounds().width + 8, 20, 300, 50); 
         titleLabel.setVerticalAlignment(SwingConstants.TOP);
+        titleLabel.setSize(titleLabel.getPreferredSize());
         
-        JLabel priceLabel = new JLabel("<html><b>Price:</b> " + p.getPrice() + "</html>");
-        priceLabel.setBounds(imageLabel.getBounds().x + imageLabel.getBounds().width + 8, titleLabel.getBounds().y + 40, 400, 25);
+        String categories = "";
+        p.getCategory().remove(0);
+        for (String s : p.getCategory()) {
+        	
+        	if (s.equals(p.getCategory().get(p.getCategory().size() - 1))) {
+        		
+        		categories += s;
+        		 
+        	} else {
+        		
+        		categories += s + " -> ";
+        	}
+        }
+        
+        JLabel categoryLabel = new JLabel("<html><div style='width: 240px;'>Category: " + categories + "</div></html>");
+        categoryLabel.setBounds(titleLabel.getX(), titleLabel.getY() + titleLabel.getHeight() + 10, 300, 50);
+        categoryLabel.setVerticalAlignment(SwingConstants.TOP);
+        categoryLabel.setSize(categoryLabel.getPreferredSize());
+        
+        JLabel priceLabel = new JLabel("Price: " + p.getPrice());
+        priceLabel.setBounds(imageLabel.getBounds().x + imageLabel.getBounds().width + 8, categoryLabel.getBounds().y + categoryLabel.getHeight() + 10, 400, 25);
 
         JLabel rankingLabel = new JLabel("Ranking: " + p.getRanking() + " / 5 --- " + p.getRankingCount() + " Votes");
         rankingLabel.setBounds(imageLabel.getBounds().x + imageLabel.getBounds().width + 8, priceLabel.getBounds().y + 30, 400, 25);
@@ -207,6 +228,7 @@ public class Main extends JFrame {
 
         this.infoPanel.add(imageLabel);
         this.infoPanel.add(titleLabel);
+        this.infoPanel.add(categoryLabel);
         this.infoPanel.add(priceLabel);
         this.infoPanel.add(rankingLabel);
         this.infoPanel.add(reviewCountLabel);
@@ -240,7 +262,7 @@ public class Main extends JFrame {
             Comment c = commentsList.get(i);
             
             JLabel commentLabel = new JLabel("<html> Date Published: " + c.getDate()  + "<br>" + c.getAuthor() + ": " + c.getText() + "<br> Rating: " + c.getRating() + "</html>");
-            commentLabel.setBounds(20, spacing, 400, 90);
+            commentLabel.setBounds(20, spacing, 460, 90);
             
             this.commentsPanel.add(commentLabel);
             spacing += 70;
