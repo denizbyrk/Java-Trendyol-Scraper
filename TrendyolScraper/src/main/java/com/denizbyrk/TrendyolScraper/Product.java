@@ -1,5 +1,7 @@
 package com.denizbyrk.TrendyolScraper;
 
+import java.util.List;
+
 public class Product {
 
 	private String imageURL;
@@ -9,23 +11,11 @@ public class Product {
 	private String rankingCount;
 	private String description;
 	private String commentCount;
+	private List<Comment> comments;
 	private String brand;
 	private String seller;
 	private String favourites;
-	
-	public void displayData() {
 		
-		System.out.println("Product Details");
-		System.out.println("---------------");
-		System.out.println("Image: " + this.getImageURL());
-		System.out.println("Title: " + this.getTitle());
-		System.out.println("Price: " + this.getPrice());
-		System.out.println("Ranking: " + this.getRanking() + " / 5 --- " + this.getRankingCount() + " Votes");
-		System.out.println("Review Count: " + this.getCommentCount());
-		System.out.println("Seller: " + this.getSeller());
-		System.out.println("Brand: " + this.getBrand());
-	}
-	
 	public Product() { }
 	
 	public Product(String imageURL, String title, String price, String ranking, String rankingCount, String description, String commentCount, String brand, String seller, String favourites) {
@@ -111,6 +101,16 @@ public class Product {
 		this.commentCount = reviewCount;
 	}
 	
+	public List<Comment> getComments() {
+		
+		return this.comments;
+	}
+	
+	public void setComments(List<Comment> comments) {
+		
+		this.comments = comments;
+	}
+	
 	public String getBrand() {
 		
 		return this.brand;
@@ -139,5 +139,19 @@ public class Product {
 	public void setFavourites(String favourites) {
 		
 		this.favourites = favourites;
+	}
+	
+	@Override
+	public String toString() {
+	    return "Product Details\n" +
+	           "---------------\n" +
+	           "Image: " + this.getImageURL() + "\n" +
+	           "Title: " + this.getTitle() + "\n" +
+	           "Price: " + this.getPrice() + "\n" +
+	           "Ranking: " + this.getRanking() + " / 5 --- " + this.getRankingCount() + " Votes\n" +
+	           "Review Count: " + this.getCommentCount() + "\n" +
+	           "Seller: " + this.getSeller() + "\n" +
+	           "Brand: " + this.getBrand() + "\n" +
+	           "Comments: " + this.getComments();
 	}
 }

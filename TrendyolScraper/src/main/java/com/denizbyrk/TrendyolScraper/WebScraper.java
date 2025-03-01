@@ -1,6 +1,8 @@
 package com.denizbyrk.TrendyolScraper;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -28,10 +30,11 @@ public class WebScraper {
 		this.product.setRanking(this.scrapeRanking());
 		this.product.setRankingCount(this.scrapeRankingCount());
 		this.product.setCommentCount(this.scrapeCommentCount());
+		this.product.setComments(this.scrapeComments());
 		this.product.setBrand(this.scrapeBrand());
 		this.product.setSeller(this.scrapeSeller());
 
-		this.product.displayData();
+		System.out.println(this.product);
 	}
 
 	//scrape image 
@@ -109,6 +112,11 @@ public class WebScraper {
 		return this.scrapeJSON("aggregateRating", "reviewCount");
 	}
 	
+	private List<Comment> scrapeComments() {
+		
+		return this.scrapeJSONcomments("", "");
+	}
+	
 	//scrape JSON data
 	private String scrapeJSON(String objectTitle) {
 		
@@ -156,6 +164,9 @@ public class WebScraper {
                     if (!contentArray.isEmpty()) {
                     
                         return contentArray.get(0).getAsString();
+                    } else {
+                    	
+                    	
                     }
                     
                 } else {
@@ -172,6 +183,43 @@ public class WebScraper {
 		}
 		
 		return data + " not found.";
+	}
+	
+	//scrape comment data
+	private List<Comment> scrapeJSONcomments(String objectTitle, String data) {
+		
+		Element e = document.selectFirst("script[type=application/ld+json]");
+		
+		List<Comment> comments = new ArrayList<Comment>();
+		
+		if (e != null) {
+			
+			String jsonContent = e.html();
+
+            JsonObject jsonObject = JsonParser.parseString(jsonContent).getAsJsonObject();
+
+            if (jsonObject.has("review")) {
+            	
+                JsonArray commentsArray = jsonObject.getAsJsonArray("review");
+
+                for (JsonElement j : commentsArray) {
+                	
+                    JsonObject commentObj = j.getAsJsonObject();
+
+                    String author = commentObj.getAsJsonObject("author").get("name").getAsString();
+                    String text = commentObj.get("reviewBody").getAsString();
+                    String date = commentObj.get("datePublished").getAsString();
+                    String rating = commentObj.getAsJsonObject("reviewRating").get("ratingValue").getAsString();
+
+                    Comment comment = new Comment(author, text, date, rating);
+                    comments.add(comment);
+                }
+                
+                return comments;
+			}
+		}
+		
+		return comments;
 	}
 
 	//get product
