@@ -16,14 +16,18 @@ import com.google.gson.JsonParser;
 
 public class WebScraper {
 
-	private Product product;
-	private Document document;
+	private Product product; //create product
+	private Document document; //create html document
 	
+	//read data
 	public void Read(String url) throws IOException {
 
 		this.product = new Product();
+		
+		//connect to url
 		this.document = Jsoup.connect(url).get();
 
+		//set product data
 		this.product.setImageURL(this.scrapeImage());
 		this.product.setTitle(this.scrapeTitle());
 		this.product.setPrice(this.scrapePrice());
@@ -47,6 +51,7 @@ public class WebScraper {
 	//scrape title
 	private String scrapeTitle() {
 
+		//find where the title is stored
 		Elements title = this.document.select(".pr-in-cn");
 
 		if (!title.isEmpty()) {
@@ -62,6 +67,7 @@ public class WebScraper {
 	//scrape price
 	private String scrapePrice() {
 
+		//find where the price is stored
 		Elements price = this.document.select(".product-price-container");
 
 		if (!price.isEmpty()) {
@@ -83,6 +89,7 @@ public class WebScraper {
 	//scrape comment count
 	private String scrapeSeller() {
 		
+		//find where the brand is stored
 		Element brand = this.document.select("span.product-description-market-place").first();
 
 		if (!brand.text().isEmpty()) {
@@ -119,22 +126,27 @@ public class WebScraper {
 		return this.scrapeJSON("aggregateRating", "reviewCount");
 	}
 	
+	//scrape comments
 	private List<Comment> scrapeComments() {
 		
 		return this.scrapeJSONcomments();
 	}
 	
-	//scrape JSON data
+	//scrape JSON data from where the object title is enough
 	private String scrapeJSON(String objectTitle) {
 		
+		//get the script
 		Element e = document.selectFirst("script[type=application/ld+json]");
 		
 		if (e != null) {
 			
+			//convert html to string
 			String jsonContent = e.html();
 
+			//parse string to json object
 			JsonObject jsonObject = JsonParser.parseString(jsonContent).getAsJsonObject();
 
+			//check if the object has object title
 			if (jsonObject.has(objectTitle)) {
 				
 				return jsonObject.get(objectTitle).getAsString();
@@ -148,34 +160,44 @@ public class WebScraper {
 		}
 	}
 	
-	//scrape JSON data
+	//scrape JSON data from places where the title has subfields, requiring data name
 	private String scrapeJSON(String objectTitle, String data) {
 		
+		//get the script
 		Element e = document.selectFirst("script[type=application/ld+json]");
 		
 		if (e != null) {
 			
+			//convert html to string
 			String jsonContent = e.html();
 
+			//parse string to json object
 			JsonObject jsonObject = JsonParser.parseString(jsonContent).getAsJsonObject();
+			
+			//get the results of the title
 			JsonObject result = jsonObject.getAsJsonObject(objectTitle);
 
 			if (result != null && result.has(data)) {
 			
+				//create json element from data
 				JsonElement element = result.get(data);
 
+				//check if the json element is an array
                 if (element.isJsonArray()) {
                 	
+                	//convert element to json array
                     JsonArray contentArray = element.getAsJsonArray();
                     
+                    //check if it is empty
                     if (!contentArray.isEmpty()) {
                     
+                    	//get the first element
                         return contentArray.get(0).getAsString();
+                        
                     } else {
                     	
-                    	
+                    	return data + " not found.";
                     }
-                    
                 } else {
                 	
                 	return result.get(data).getAsString();
@@ -188,32 +210,44 @@ public class WebScraper {
 			
 			return data + " not found.";
 		}
-		
-		return data + " not found.";
 	}
 	
 	//scrape category data
 	private List<String> scrapeJSONcategory() {
 		
+		//get the script
 		Element e = document.select("script[type=application/ld+json]").get(1);
 		
+		//create empty categories list
 		List<String> categories = new ArrayList<String>();
 		
 		if (e != null) {
 			
+			//convert html to string
 			String jsonContent = e.html();
 			
+			//parse string to json object
             JsonObject jsonObject = JsonParser.parseString(jsonContent).getAsJsonObject();
+            
+            //get breadcrumb object
             JsonObject breadcrumb = jsonObject.getAsJsonObject("breadcrumb");
+            
+            //get the categories as json array
             JsonArray itemList = breadcrumb.getAsJsonArray("itemListElement");
             
+            //iterate through elements
             for (JsonElement element : itemList) {
                 
+            	//convert to json object
                 JsonObject listItem = element.getAsJsonObject();
+                
+                //get individual items
                 JsonObject item = listItem.getAsJsonObject("item");
 
+                //convert to string
                 String name = item.get("name").getAsString();
                 
+                //add category to the list
                 categories.add(name);
             }
             
@@ -226,29 +260,39 @@ public class WebScraper {
 	//scrape comment data
 	private List<Comment> scrapeJSONcomments() {
 		
+		//get the script
 		Element e = document.selectFirst("script[type=application/ld+json]");
 		
+		//create empty comments list
 		List<Comment> comments = new ArrayList<Comment>();
 		
 		if (e != null) {
 			
+			//convert html to string
 			String jsonContent = e.html();
 
+			//parse string to json object
             JsonObject jsonObject = JsonParser.parseString(jsonContent).getAsJsonObject();
 
+            //check if the json object has review field
             if (jsonObject.has("review")) {
             	
+            	//convert to json array
                 JsonArray commentsArray = jsonObject.getAsJsonArray("review");
 
+                //iterate through comments array
                 for (JsonElement j : commentsArray) {
                 	
+                	//convert to json object
                     JsonObject commentObj = j.getAsJsonObject();
 
+                    //parse the fields to strings
                     String author = commentObj.getAsJsonObject("author").get("name").getAsString();
                     String text = commentObj.get("reviewBody").getAsString();
                     String date = commentObj.get("datePublished").getAsString();
                     String rating = commentObj.getAsJsonObject("reviewRating").get("ratingValue").getAsString();
 
+                    //create comment object and add to list
                     Comment comment = new Comment(author, text, date, rating);
                     comments.add(comment);
                 }

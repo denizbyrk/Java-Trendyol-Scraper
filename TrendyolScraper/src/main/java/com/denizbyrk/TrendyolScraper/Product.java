@@ -4,22 +4,22 @@ import java.util.List;
 
 public class Product {
 
+	//product attributes
 	private String imageURL;
-	private String title;
+	private String title; 
 	private String price;
 	private List<String> category;
 	private String ranking;
 	private String rankingCount;
-	private String description;
 	private String commentCount;
 	private List<Comment> comments;
 	private String brand;
 	private String seller;
-	private String favourites;
 		
 	public Product() { }
 	
-	public Product(String imageURL, String title, String price, List<String> category, String ranking, String rankingCount, String description, String commentCount, List<Comment> comments, String brand, String seller, String favourites) {
+	//constructor
+	public Product(String imageURL, String title, String price, List<String> category, String ranking, String rankingCount, String commentCount, List<Comment> comments, String brand, String seller) {
 
 		this.imageURL = imageURL;
 		this.title = title;
@@ -27,14 +27,13 @@ public class Product {
 		this.category = category;
 		this.ranking = ranking;
 		this.rankingCount = rankingCount;
-		this.description = description;
 		this.commentCount = commentCount;
 		this.comments = comments;
 		this.brand = brand;
 		this.seller = seller;
-		this.favourites = favourites;
 	}
 
+	//getters and setters
 	public String getImageURL() {
 		
 		return this.imageURL;
@@ -94,16 +93,6 @@ public class Product {
 		this.rankingCount = rankingCount;
 	}
 	
-	public String getDescription() {
-		
-		return this.description;
-	}
-	
-	public void setDescription(String description) {
-		
-		this.description = description;
-	}
-	
 	public String getCommentCount() {
 		
 		return this.commentCount;
@@ -144,16 +133,7 @@ public class Product {
 		this.seller = seller;
 	}
 	
-	public String getFavourites() {
-		
-		return this.favourites;
-	}
-	
-	public void setFavourites(String favourites) {
-		
-		this.favourites = favourites;
-	}
-	
+	//to string method
 	@Override
 	public String toString() {
 	    return "Product Details\n" +

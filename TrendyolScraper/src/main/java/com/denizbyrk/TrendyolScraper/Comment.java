@@ -2,6 +2,7 @@ package com.denizbyrk.TrendyolScraper;
 
 public class Comment {
 
+	//comment attributes
 	private String author;
 	private String text;
 	private String date;
@@ -9,6 +10,7 @@ public class Comment {
 	
 	public Comment() { }
 
+	//constructor
 	public Comment(String author, String text, String date, String rating) {
 
 		this.author = author;
@@ -17,6 +19,7 @@ public class Comment {
 		this.rating = rating;
 	}
 
+	//getters and setters
 	public String getAuthor() {
 		
 		return author;
@@ -57,14 +60,15 @@ public class Comment {
 		this.rating = rating;
 	}
 	
+	//to string method
 	@Override
 	public String toString() {
 		
 		return "Comment{" +
-	                "Author: " + author +
-	                ", Date: " + date + 
-	                ", Text: " + text +
-	                ", Rating: " + rating +
+	                "Author: " + this.getAuthor() +
+	                ", Date: " + this.getDate() + 
+	                ", Text: " + this.getText() +
+	                ", Rating: " + this.getRating() +
 	                "}";
 	}
 }

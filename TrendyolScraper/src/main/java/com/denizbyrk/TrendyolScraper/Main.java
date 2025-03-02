@@ -30,6 +30,8 @@ import javax.swing.border.LineBorder;
 public class Main extends JFrame {
 
 	private static final long serialVersionUID = 1L;
+	
+	//window dimensions
 	private final static int WIDTH = 600;
 	private final static int HEIGHT = 800;
 	
@@ -41,10 +43,11 @@ public class Main extends JFrame {
     private Font font;
     private Font dataFont;
     
-    private int currentPage = 0;
-    private int commentsPerPage = 4;
+    private int currentPage = 0; //current comment page
+    private int commentsPerPage = 4; //comments displayed per page
     private List<Comment> commentsList = new ArrayList<Comment>();
-    private JButton prevButton, nextButton;
+    private JButton prevButton;
+    private JButton nextButton;
 
     public Main() {
     	
@@ -52,7 +55,7 @@ public class Main extends JFrame {
         this.setResizable(false);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(Main.WIDTH, Main.HEIGHT);
-        this.setLocationRelativeTo(null);
+        this.setLocationRelativeTo(null); //sets the window position to the center of the screen
 
         this.font = new Font("Arial", Font.BOLD, 18);
         this.dataFont = new Font("Arial", Font.BOLD, 12);
@@ -98,6 +101,7 @@ public class Main extends JFrame {
         this.urlField.setBounds(urlLabel.getBounds().x + 50, titleLabel.getBounds().y + 30, fetchButton.getBounds().x - urlLabel.getBounds().x - fetchButton.getBounds().width + 30, 25);
         contentPane.add(urlField);
         
+        //create info panel
         this.infoPanel = new JPanel();
         this.infoPanel.setLayout(null);
         this.infoPanel.setBounds(urlLabel.getBounds().x, urlLabel.getBounds().y + 40, fetchButton.getBounds().x + fetchButton.getBounds().width - urlLabel.getBounds().width + 30, Main.HEIGHT - 140);
@@ -127,11 +131,13 @@ public class Main extends JFrame {
         	
             public void actionPerformed(ActionEvent e) {
             	
+            	//get url
                 String url = urlField.getText();
                 
                 if (!url.isEmpty()) {
                 	
                     try {
+                    	//process url
 						processURL(url);
 					} catch (IOException e1) {
 
@@ -162,8 +168,10 @@ public class Main extends JFrame {
         System.out.println("Processing URL: " + url);
         System.out.println(lines + "\n");
         
+        //check if the url is a valid trendyol link
         if (url.startsWith("https://www.trendyol.com/")) {
         	
+        	//display info panel
         	this.displayInfoPanel(url);
         } else {
         	
@@ -174,33 +182,41 @@ public class Main extends JFrame {
     //display scraped data
     private void displayInfoPanel(String url) throws IOException {
     	
+    	//read data
         WebScraper ws = new WebScraper();
         ws.Read(url);
     	
         this.infoPanel.removeAll();
         this.fetchButton.setEnabled(false);
         
+        //get product
         Product p = ws.getProduct();
 
+        //get comments
         this.commentsList = p.getComments();
-        
+ 
+        //create image
         ImageIcon imageIcon = new ImageIcon(new URL(p.getImageURL()));
         Image image = imageIcon.getImage();
         Image scaledImage = image.getScaledInstance(getWidth() / 3, getHeight() / 3, Image.SCALE_SMOOTH);
 
+        //create image label
         JLabel imageLabel = new JLabel(new ImageIcon(scaledImage));
         imageLabel.setBounds(20, 20, scaledImage.getWidth(imageLabel), scaledImage.getHeight(imageLabel));
         imageLabel.setBorder(new LineBorder(Color.BLACK, 2));
         
+        //create title label
         JLabel titleLabel = new JLabel("<html><div style='width: 240px;'>Title: " + p.getTitle() + "</div></html>");
         titleLabel.setBounds(imageLabel.getBounds().x + imageLabel.getBounds().width + 8, 20, 300, 50); 
         titleLabel.setVerticalAlignment(SwingConstants.TOP);
         titleLabel.setSize(titleLabel.getPreferredSize());
         
+        //get categories
         String categories = "";
         p.getCategory().remove(0);
         for (String s : p.getCategory()) {
         	
+        	//check if the category is the last one
         	if (s.equals(p.getCategory().get(p.getCategory().size() - 1))) {
         		
         		categories += s;
@@ -211,26 +227,33 @@ public class Main extends JFrame {
         	}
         }
         
+        //create categories label
         JLabel categoryLabel = new JLabel("<html><div style='width: 240px;'>Category: " + categories + "</div></html>");
         categoryLabel.setBounds(titleLabel.getX(), titleLabel.getY() + titleLabel.getHeight() + 10, 300, 50);
         categoryLabel.setVerticalAlignment(SwingConstants.TOP);
         categoryLabel.setSize(categoryLabel.getPreferredSize());
         
+        //create price label
         JLabel priceLabel = new JLabel("Price: " + p.getPrice());
         priceLabel.setBounds(imageLabel.getBounds().x + imageLabel.getBounds().width + 8, categoryLabel.getBounds().y + categoryLabel.getHeight() + 10, 400, 25);
 
+        //create ranking label
         JLabel rankingLabel = new JLabel("Ranking: " + p.getRanking() + " / 5 --- " + p.getRankingCount() + " Votes");
         rankingLabel.setBounds(imageLabel.getBounds().x + imageLabel.getBounds().width + 8, priceLabel.getBounds().y + 30, 400, 25);
 
+        //create seller label
         JLabel sellerLabel = new JLabel("Seller: " + p.getSeller());
         sellerLabel.setBounds(imageLabel.getBounds().x + imageLabel.getBounds().width + 8, rankingLabel.getBounds().y + 30, 400, 25);
         
+        //create brand label
         JLabel brandLabel = new JLabel("Brand: " + p.getBrand());
         brandLabel.setBounds(imageLabel.getBounds().x + imageLabel.getBounds().width + 8, sellerLabel.getBounds().y + 30, 400, 25);
 
+        //create review count label
         JLabel reviewCountLabel = new JLabel("Comment Count: " + p.getCommentCount());
         reviewCountLabel.setBounds(imageLabel.getBounds().x + imageLabel.getBounds().width + 8, brandLabel.getBounds().y + 30, 400, 25);
         
+        //create clear button
         clearButton = new JButton("Clear");
         clearButton.setFont(this.font);
         clearButton.setFocusPainted(false);
@@ -241,7 +264,7 @@ public class Main extends JFrame {
         clearButton.setBorder(compound);
         this.infoPanel.add(clearButton);
         
-        //add mouse listener to change color on hover
+        //add mouse listener to clear button to change color on hover
         clearButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
@@ -254,17 +277,19 @@ public class Main extends JFrame {
             }
         });
         
-        //button Action Listener
+        //Action Listener for clear button
         clearButton.addActionListener(new ActionListener() {
         	
             public void actionPerformed(ActionEvent e) {
             	
-                infoPanel.setVisible(false);
-                fetchButton.setEnabled(true);
-                urlField.setText("");
+                infoPanel.setVisible(false); //make info panel invisible
+                fetchButton.setEnabled(true); //enable fetch button
+                urlField.setText(""); //clear url field
+                currentPage = 0; //set current comment page to 0
             }
         });
         
+        //add components to info panel
         this.infoPanel.add(imageLabel);
         this.infoPanel.add(titleLabel);
         this.infoPanel.add(categoryLabel);
@@ -274,6 +299,7 @@ public class Main extends JFrame {
         this.infoPanel.add(brandLabel);
         this.infoPanel.add(reviewCountLabel);
         
+        //create comments panel
         this.commentsPanel = new JPanel();
         this.commentsPanel.setLayout(null);
         this.commentsPanel.setBounds(imageLabel.getBounds().x - 2, imageLabel.getBounds().y + imageLabel.getBounds().height, infoPanel.getWidth() - 36, infoPanel.getHeight() - 300);
@@ -281,6 +307,7 @@ public class Main extends JFrame {
         this.commentsPanel.setVisible(false);
         this.infoPanel.add(this.commentsPanel);
         
+        //display comments
         this.displayComments();
 
         this.infoPanel.setVisible(true);
@@ -289,24 +316,31 @@ public class Main extends JFrame {
     //display comments
     private void displayComments() {
 
+    	//clear comments panel
     	this.commentsPanel.removeAll();
 
+    	//calculate starting index
         int startIndex = currentPage * commentsPerPage;
+        
+        //calculate ending index
         int endIndex = Math.min(startIndex + commentsPerPage, commentsList.size());
 
+        //spacing between comments
         int spacing = 12;
         
         for (int i = startIndex; i < endIndex; i++) {
         	
             Comment c = commentsList.get(i);
             
+            //label for comment
             JLabel commentLabel = new JLabel("<html> Date Published: " + c.getDate()  + "<br>" + c.getAuthor() + ": " + c.getText() + "<br> Rating: " + c.getRating() + "</html>");
             commentLabel.setBounds(20, spacing, 460, 90);
             
             this.commentsPanel.add(commentLabel);
-            spacing += 70;
+            spacing += 70; //increase spacing
         }
 
+        //add the buttons
         this.addPageButtons();
 
         this.commentsPanel.revalidate();
@@ -317,6 +351,7 @@ public class Main extends JFrame {
     //add comment page change buttons
     private void addPageButtons() {
     	
+    	//remove old button state
         if (prevButton != null) this.commentsPanel.remove(prevButton);
         if (nextButton != null) this.commentsPanel.remove(nextButton);
 
@@ -324,6 +359,7 @@ public class Main extends JFrame {
         Border margin = new EmptyBorder(5, 15, 5, 15);
         Border compound = new CompoundBorder(line, margin);
         
+        //create prev button
         prevButton = new JButton("Previous Page");
         prevButton.setBounds(20, this.commentsPanel.getHeight() - 50, this.commentsPanel.getWidth() / 2 - 30, 40);
         prevButton.setEnabled(currentPage > 0);
@@ -331,10 +367,11 @@ public class Main extends JFrame {
         prevButton.setBorder(compound);
         prevButton.addActionListener(e -> {
         	
-            currentPage--;
-            this.displayComments();
+            currentPage--; //go to prev page
+            this.displayComments(); //display comments
         });
 
+        //create next button
         nextButton = new JButton("Next Page");
         nextButton.setBounds(prevButton.getX() + prevButton.getWidth() + 20, this.commentsPanel.getHeight() - 50, prevButton.getWidth(), 40);
         nextButton.setEnabled((currentPage + 1) * commentsPerPage < commentsList.size());
@@ -342,11 +379,11 @@ public class Main extends JFrame {
         nextButton.setBorder(compound);
         nextButton.addActionListener(e -> {
         	
-            currentPage++;
-            this.displayComments();
+            currentPage++; //go to next page
+            this.displayComments(); //display comments
         });
         
-        //add mouse listener to change color on hover
+        //add mouse listener to prev button to change color on hover
         prevButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
@@ -363,7 +400,7 @@ public class Main extends JFrame {
             }
         });
         
-        //add mouse listener to change color on hover
+        //add mouse listener to next button to change color on hover
         nextButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
@@ -380,10 +417,12 @@ public class Main extends JFrame {
             }
         });
 
+        //add button to comments panel
         this.commentsPanel.add(prevButton);
         this.commentsPanel.add(nextButton);
     }
     
+    //main method
     public static void main(String[] args) {
     	
         new Main();
