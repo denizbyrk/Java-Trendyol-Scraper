@@ -163,9 +163,9 @@ public class Product {
 	           "Category: " + this.getCategory() + "\n" +
 	           "Price: " + this.getPrice() + "\n" +
 	           "Ranking: " + this.getRanking() + " / 5 --- " + this.getRankingCount() + " Votes\n" +
-	           "Review Count: " + this.getCommentCount() + "\n" +
 	           "Seller: " + this.getSeller() + "\n" +
 	           "Brand: " + this.getBrand() + "\n" +
+	           "Review Count: " + this.getCommentCount() + "\n" +
 	           "Comments: " + this.getComments();
 	}
 }

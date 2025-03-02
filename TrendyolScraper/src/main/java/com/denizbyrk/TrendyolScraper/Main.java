@@ -1,7 +1,6 @@
 package com.denizbyrk.TrendyolScraper;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
@@ -36,6 +35,7 @@ public class Main extends JFrame {
 	
     private JTextField urlField;
     private JButton fetchButton;
+    private JButton clearButton;
     private JPanel infoPanel;
     private JPanel commentsPanel;
     private Font font;
@@ -72,7 +72,7 @@ public class Main extends JFrame {
         JLabel titleLabel = new JLabel("Trendyol Web Scraper");
         titleLabel.setFont(this.font);
         titleLabel.setForeground(Color.BLACK);
-        titleLabel.setBounds(Main.WIDTH / 2 - 360 / 4, 20, titleLabel.getText().length() * this.font.getSize(), 25);
+        titleLabel.setBounds(Main.WIDTH / 2 - 105, 20, titleLabel.getText().length() * this.font.getSize(), 25);
         contentPane.add(titleLabel);
         
         //URL label (top left)
@@ -106,10 +106,14 @@ public class Main extends JFrame {
         contentPane.add(this.infoPanel);
         
         //add mouse listener to change color on hover
-        fetchButton.addMouseListener(new MouseAdapter() {
+        this.fetchButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-            	fetchButton.setBackground(Color.GRAY);
+            	
+            	if (fetchButton.isEnabled()) {
+            		
+            		fetchButton.setBackground(Color.GRAY);
+            	}
             }
 
             @Override
@@ -119,7 +123,7 @@ public class Main extends JFrame {
         });
         
         //button Action Listener
-        fetchButton.addActionListener(new ActionListener() {
+        this.fetchButton.addActionListener(new ActionListener() {
         	
             public void actionPerformed(ActionEvent e) {
             	
@@ -173,7 +177,8 @@ public class Main extends JFrame {
         WebScraper ws = new WebScraper();
         ws.Read(url);
     	
-        this.infoPanel.removeAll(); 
+        this.infoPanel.removeAll();
+        this.fetchButton.setEnabled(false);
         
         Product p = ws.getProduct();
 
@@ -217,23 +222,57 @@ public class Main extends JFrame {
         JLabel rankingLabel = new JLabel("Ranking: " + p.getRanking() + " / 5 --- " + p.getRankingCount() + " Votes");
         rankingLabel.setBounds(imageLabel.getBounds().x + imageLabel.getBounds().width + 8, priceLabel.getBounds().y + 30, 400, 25);
 
-        JLabel reviewCountLabel = new JLabel("Comment Count: " + p.getCommentCount());
-        reviewCountLabel.setBounds(imageLabel.getBounds().x + imageLabel.getBounds().width + 8, rankingLabel.getBounds().y + 30, 400, 25);
-
         JLabel sellerLabel = new JLabel("Seller: " + p.getSeller());
-        sellerLabel.setBounds(imageLabel.getBounds().x + imageLabel.getBounds().width + 8, reviewCountLabel.getBounds().y + 30, 400, 25);
+        sellerLabel.setBounds(imageLabel.getBounds().x + imageLabel.getBounds().width + 8, rankingLabel.getBounds().y + 30, 400, 25);
         
         JLabel brandLabel = new JLabel("Brand: " + p.getBrand());
         brandLabel.setBounds(imageLabel.getBounds().x + imageLabel.getBounds().width + 8, sellerLabel.getBounds().y + 30, 400, 25);
 
+        JLabel reviewCountLabel = new JLabel("Comment Count: " + p.getCommentCount());
+        reviewCountLabel.setBounds(imageLabel.getBounds().x + imageLabel.getBounds().width + 8, brandLabel.getBounds().y + 30, 400, 25);
+        
+        clearButton = new JButton("Clear");
+        clearButton.setFont(this.font);
+        clearButton.setFocusPainted(false);
+        clearButton.setBounds(Main.WIDTH - 184, titleLabel.getBounds().y + 240, 100, 25);
+        Border line = new LineBorder(Color.BLACK);
+        Border margin = new EmptyBorder(5, 15, 5, 15);
+        Border compound = new CompoundBorder(line, margin);
+        clearButton.setBorder(compound);
+        this.infoPanel.add(clearButton);
+        
+        //add mouse listener to change color on hover
+        clearButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+            	clearButton.setBackground(Color.GRAY);
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+            	clearButton.setBackground(Color.WHITE);
+            }
+        });
+        
+        //button Action Listener
+        clearButton.addActionListener(new ActionListener() {
+        	
+            public void actionPerformed(ActionEvent e) {
+            	
+                infoPanel.setVisible(false);
+                fetchButton.setEnabled(true);
+                urlField.setText("");
+            }
+        });
+        
         this.infoPanel.add(imageLabel);
         this.infoPanel.add(titleLabel);
         this.infoPanel.add(categoryLabel);
         this.infoPanel.add(priceLabel);
         this.infoPanel.add(rankingLabel);
-        this.infoPanel.add(reviewCountLabel);
         this.infoPanel.add(sellerLabel);
         this.infoPanel.add(brandLabel);
+        this.infoPanel.add(reviewCountLabel);
         
         this.commentsPanel = new JPanel();
         this.commentsPanel.setLayout(null);
@@ -305,6 +344,40 @@ public class Main extends JFrame {
         	
             currentPage++;
             this.displayComments();
+        });
+        
+        //add mouse listener to change color on hover
+        prevButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+            	
+            	if (prevButton.isEnabled()) {
+            		
+            		prevButton.setBackground(Color.GRAY);
+            	}
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+            	prevButton.setBackground(Color.WHITE);
+            }
+        });
+        
+        //add mouse listener to change color on hover
+        nextButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseEntered(MouseEvent e) {
+            	
+            	if (nextButton.isEnabled()) {
+            		
+            		nextButton.setBackground(Color.GRAY);
+            	}
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+            	nextButton.setBackground(Color.WHITE);
+            }
         });
 
         this.commentsPanel.add(prevButton);
